@@ -11,7 +11,6 @@ public class LinkedFSM {
 	private ArrayList<Character> terminals;
 	//TODO: add in terminal alphabet and a check to make sure the input contains symbols only from that alphabet
 	//TODO: add in transition table and method to automatically create transitions from it
-	//TODO: figure out how to implement lambda moves (perhaps with space characters?)
 
 	public LinkedFSM(boolean startAccepting, ArrayList<Character> terminals)
 	{
@@ -55,15 +54,8 @@ public class LinkedFSM {
 	 * Connects State A to State B with a transition that consumes character 'c'
 	 */
 	public boolean connect(State a, State b, char c)
-	{
-		if (this.terminals.contains(c))
-		{
-			return a.setTransition(b, c);
-		}
-		else
-		{
-			return false;
-		}
+	{		
+		return (this.terminals.contains(c) ? a.setTransition(b, c) : false);
 	}
 
 	/**
@@ -75,8 +67,6 @@ public class LinkedFSM {
 		{
 			this.inhabitedStates.clear();
 			this.inhabitedStates.add(deadState);
-		//	System.out.println("We hit an unexpected character. Entering dead state...");
-			//return this.inhabitedStates;
 		}
 		
 		ArrayList<State> destinations = new ArrayList<State>();
@@ -86,20 +76,25 @@ public class LinkedFSM {
 			{
 				for(State d : state.getNext(c))
 				{
-					destinations.add(d);
+					if(!destinations.contains(d))
+					{
+						destinations.add(d);
+					}
 				}
 			}
 			if(state.getTransitions().containsKey('\0'))
 			{
 				for(State d : state.getNext('\0'))
 				{
-					destinations.add(d);
+					if(!destinations.contains((d)))
+					{
+						destinations.add(d);
+					}
 				}
 			}
 		}
 
 		this.inhabitedStates = destinations;
-		//return destinations; //all the states we can be in after consuming a character 'c'
 	}
 
 	/**
@@ -111,11 +106,9 @@ public class LinkedFSM {
 		{
 			if(state.isAccepting())
 			{
-				//System.out.println("We're accepting at this point.");
 				return true;
 			}
 		}
-		//System.out.println("We're not accepting at this point.");
 		return false;
 	}
 
